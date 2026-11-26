@@ -4,12 +4,12 @@ import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type ReactNod
 import { dashboardFilterOptions, dashboardRooms, dashboardUiCopy, type DashboardRoom, type RoomStatus } from "../../lib/dashboard-placeholder";
 import { Placeholder } from "../Placeholder";
 import { Dropdown } from "../ui/Dropdown";
-import { ArchiveIcon, BoxIcon, ChatIcon, CheckIcon, ChevronIcon, ChevronRightIcon, ClockIcon, DuplicateIcon, EditIcon, EyeIcon, ExpandIcon, FilterIcon, MoreIcon, PeopleIcon, PlusIcon, PublishIcon, SearchIcon, TagIcon, UnpublishIcon, WaterIcon } from "../ui/icons";
+import { ArchiveIcon, BoxIcon, ChatIcon, CheckIcon, ChevronIcon, ChevronRightIcon, ClockIcon, DuplicateIcon, EditIcon, EyeIcon, ExpandIcon, FilterIcon, MoreIcon, PeopleIcon, PlusIcon, PublishIcon, SearchIcon, TagIcon, UnpublishIcon } from "../ui/icons";
 
 type RoomTab = typeof dashboardFilterOptions.tabs[number];
-type FilterState = { statuses: RoomStatus[]; types: string[]; properties: string[]; inclusions: string[]; from: string; to: string; search: string };
+type FilterState = { statuses: RoomStatus[]; types: string[]; properties: string[]; search: string };
 
-const initialFilters: FilterState = { statuses: [], types: [], properties: [], inclusions: [], from: "", to: "", search: "" };
+const initialFilters: FilterState = { statuses: [], types: [], properties: [], search: "" };
 const statIcons = { chat: ChatIcon, eye: EyeIcon, clock: ClockIcon };
 const ROOM_CARD_IMAGE_RATIO = "16 / 10";
 
@@ -41,7 +41,7 @@ function RoomFilters({ filters, setFilters, onClear, onClose, isOpen }: {
   onClose: () => void;
   isOpen: boolean;
 }) {
-  const setList = (key: "statuses" | "types" | "properties" | "inclusions", value: string, checked: boolean) => {
+  const setList = (key: "statuses" | "types" | "properties", value: string, checked: boolean) => {
     const current = filters[key] as string[];
     const updated = checked ? [...current, value] : current.filter((item) => item !== value);
     setFilters({ ...filters, [key]: updated });
@@ -64,17 +64,6 @@ function RoomFilters({ filters, setFilters, onClear, onClose, isOpen }: {
         </FilterGroup>
         <FilterGroup title={dashboardUiCopy.propertyGroup}>
           {dashboardFilterOptions.properties.map((property) => <FilterCheckbox key={property} label={property} checked={filters.properties.includes(property)} onChange={(checked) => setList("properties", property, checked)} />)}
-        </FilterGroup>
-        <FilterGroup title={dashboardUiCopy.priceGroup} initiallyOpen={false}>
-          <div className="dashboard-price-inputs">
-            <label>{dashboardUiCopy.priceFrom}<input type="number" min="0" value={filters.from} aria-label={dashboardUiCopy.minimumPrice} onChange={(event) => setFilters({ ...filters, from: event.target.value })} /></label>
-            <label>{dashboardUiCopy.priceTo}<input type="number" min="0" value={filters.to} aria-label={dashboardUiCopy.maximumPrice} onChange={(event) => setFilters({ ...filters, to: event.target.value })} /></label>
-          </div>
-          <label className="dashboard-range-label" htmlFor="dashboard-max-price">{dashboardUiCopy.maxPrice}</label>
-          <input id="dashboard-max-price" className="dashboard-range" type="range" min="0" max="15000" step="500" value={filters.to || 15000} onChange={(event) => setFilters({ ...filters, to: event.target.value })} />
-        </FilterGroup>
-        <FilterGroup title={dashboardUiCopy.inclusionsGroup} initiallyOpen={false}>
-          {dashboardFilterOptions.inclusions.map((inclusion) => <FilterCheckbox key={inclusion} label={inclusion} checked={filters.inclusions.includes(inclusion)} onChange={(checked) => setList("inclusions", inclusion, checked)} />)}
         </FilterGroup>
         <button className="dashboard-clear-filters" type="button" onClick={onClear}>{dashboardUiCopy.clearFilters}</button>
       </aside>
@@ -115,7 +104,7 @@ function RoomCard({ room, selected, onSelect }: { room: DashboardRoom; selected:
 function RoomDetail({ room, open, onClose, onExpand, expanded }: { room: DashboardRoom; open: boolean; onClose: () => void; onExpand: () => void; expanded: boolean }) {
   const [openRow, setOpenRow] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
-  const groups = [dashboardUiCopy.description, dashboardUiCopy.inclusionDetails, dashboardUiCopy.photos, dashboardUiCopy.listing];
+  const groups = [dashboardUiCopy.description, dashboardUiCopy.photos, dashboardUiCopy.listing];
   const statusClass = room.status === "Vacant" ? "vacant" : room.status === "Occupied" ? "occupied" : "maintenance";
   return (
     <>
@@ -145,11 +134,11 @@ function RoomDetail({ room, open, onClose, onExpand, expanded }: { room: Dashboa
               return (
                 <section className="dashboard-detail-row" key={group.title}>
                   <button type="button" aria-expanded={isOpen} onClick={() => setOpenRow(isOpen ? null : group.title)}>
-                    <span className="dashboard-detail-row-icon">{group.title === dashboardUiCopy.description.title ? <BoxIcon /> : group.title === dashboardUiCopy.inclusionDetails.title ? <WaterIcon /> : group.title === dashboardUiCopy.photos.title ? <EyeIcon /> : <TagIcon />}</span>
+                    <span className="dashboard-detail-row-icon">{group.title === dashboardUiCopy.description.title ? <BoxIcon /> : group.title === dashboardUiCopy.photos.title ? <EyeIcon /> : <TagIcon />}</span>
                     <span className="dashboard-detail-row-copy"><strong>{group.title}</strong><small>{group.subtitle}</small></span>
                     <ChevronRightIcon className={isOpen ? "is-open" : ""} />
                   </button>
-                  {isOpen && <div className="dashboard-detail-row-content">{group.title === dashboardUiCopy.inclusionDetails.title ? room.inclusions.join(" · ") : group.title === dashboardUiCopy.description.title ? `₱${room.price.toLocaleString()} / month · ${room.property}` : group.title === dashboardUiCopy.listing.title ? (room.listed ? dashboardUiCopy.listed : dashboardUiCopy.draft) : dashboardUiCopy.photos.subtitle}</div>}
+                  {isOpen && <div className="dashboard-detail-row-content">{group.title === dashboardUiCopy.description.title ? `₱${room.price.toLocaleString()} / month · ${room.property}` : group.title === dashboardUiCopy.listing.title ? (room.listed ? dashboardUiCopy.listed : dashboardUiCopy.draft) : dashboardUiCopy.photos.subtitle}</div>}
                 </section>
               );
             })}
@@ -182,12 +171,9 @@ export function RoomsDashboard() {
     const statusMatch = filters.statuses.length === 0 || filters.statuses.includes(room.status);
     const typeMatch = filters.types.length === 0 || filters.types.includes(room.type);
     const propertyMatch = filters.properties.length === 0 || filters.properties.includes(room.property);
-    const inclusionMatch = filters.inclusions.length === 0 || filters.inclusions.every((item) => room.inclusions.includes(item));
-    const fromMatch = !filters.from || room.price >= Number(filters.from);
-    const toMatch = !filters.to || room.price <= Number(filters.to);
     const query = filters.search.trim().toLowerCase();
     const searchMatch = !query || `${room.name} ${room.property}`.toLowerCase().includes(query);
-    return tabMatch && statusMatch && typeMatch && propertyMatch && inclusionMatch && fromMatch && toMatch && searchMatch;
+    return tabMatch && statusMatch && typeMatch && propertyMatch && searchMatch;
   }), [filters, tab]);
   const pageCount = Math.max(1, Math.ceil(filteredRooms.length / 6));
   const currentPage = Math.min(page, pageCount);

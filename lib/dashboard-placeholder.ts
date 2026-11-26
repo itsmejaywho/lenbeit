@@ -9,23 +9,22 @@ export type DashboardRoom = {
   listed: boolean;
   tone: "sand" | "stone" | "clay";
   type: "Boarding house" | "Apartment" | "House";
-  inclusions: string[];
 };
 
 // TODO: Replace these local examples with the landlord's room records.
 export const dashboardRooms: DashboardRoom[] = [
-  { id: "room-01", name: "Room 01 · Garden wing", property: "Willow Boarding House", price: 4500, status: "Vacant", listed: true, tone: "sand", type: "Boarding house", inclusions: ["Water", "Wifi"] },
-  { id: "room-02", name: "Room 02 · Corner room", property: "Willow Boarding House", price: 5200, status: "Occupied", listed: true, tone: "stone", type: "Boarding house", inclusions: ["Water", "Wifi", "Electricity"] },
-  { id: "room-03", name: "Studio 3A", property: "Mabini Residences", price: 9800, status: "Vacant", listed: true, tone: "clay", type: "Apartment", inclusions: ["Water", "Aircon"] },
-  { id: "room-04", name: "Room 04 · East side", property: "Willow Boarding House", price: 4300, status: "Under maintenance", listed: false, tone: "stone", type: "Boarding house", inclusions: ["Water"] },
-  { id: "room-05", name: "Studio 5B", property: "Mabini Residences", price: 10500, status: "Occupied", listed: true, tone: "sand", type: "Apartment", inclusions: ["Water", "Wifi", "Aircon"] },
-  { id: "room-06", name: "Garden room", property: "Acacia House", price: 7200, status: "Vacant", listed: false, tone: "clay", type: "House", inclusions: ["Water", "Electricity"] },
-  { id: "room-07", name: "Room 07 · Shared bath", property: "Willow Boarding House", price: 3900, status: "Occupied", listed: true, tone: "sand", type: "Boarding house", inclusions: ["Water", "Wifi"] },
-  { id: "room-08", name: "Studio 8C", property: "Mabini Residences", price: 8900, status: "Vacant", listed: true, tone: "stone", type: "Apartment", inclusions: ["Water", "Electricity", "Aircon"] },
-  { id: "room-09", name: "Front bedroom", property: "Acacia House", price: 6800, status: "Occupied", listed: true, tone: "clay", type: "House", inclusions: ["Water", "Wifi"] },
-  { id: "room-10", name: "Room 10 · Upper floor", property: "Willow Boarding House", price: 4700, status: "Vacant", listed: false, tone: "stone", type: "Boarding house", inclusions: ["Water", "Electricity"] },
-  { id: "room-11", name: "Studio 11A", property: "Mabini Residences", price: 11200, status: "Under maintenance", listed: false, tone: "sand", type: "Apartment", inclusions: ["Water", "Wifi", "Aircon"] },
-  { id: "room-12", name: "Garden suite", property: "Acacia House", price: 8400, status: "Vacant", listed: true, tone: "clay", type: "House", inclusions: ["Water", "Wifi", "Electricity"] },
+  { id: "room-01", name: "Room 01 · Garden wing", property: "Willow Boarding House", price: 4500, status: "Vacant", listed: true, tone: "sand", type: "Boarding house" },
+  { id: "room-02", name: "Room 02 · Corner room", property: "Willow Boarding House", price: 5200, status: "Occupied", listed: true, tone: "stone", type: "Boarding house" },
+  { id: "room-03", name: "Studio 3A", property: "Mabini Residences", price: 9800, status: "Vacant", listed: true, tone: "clay", type: "Apartment" },
+  { id: "room-04", name: "Room 04 · East side", property: "Willow Boarding House", price: 4300, status: "Under maintenance", listed: false, tone: "stone", type: "Boarding house" },
+  { id: "room-05", name: "Studio 5B", property: "Mabini Residences", price: 10500, status: "Occupied", listed: true, tone: "sand", type: "Apartment" },
+  { id: "room-06", name: "Garden room", property: "Acacia House", price: 7200, status: "Vacant", listed: false, tone: "clay", type: "House" },
+  { id: "room-07", name: "Room 07 · Shared bath", property: "Willow Boarding House", price: 3900, status: "Occupied", listed: true, tone: "sand", type: "Boarding house" },
+  { id: "room-08", name: "Studio 8C", property: "Mabini Residences", price: 8900, status: "Vacant", listed: true, tone: "stone", type: "Apartment" },
+  { id: "room-09", name: "Front bedroom", property: "Acacia House", price: 6800, status: "Occupied", listed: true, tone: "clay", type: "House" },
+  { id: "room-10", name: "Room 10 · Upper floor", property: "Willow Boarding House", price: 4700, status: "Vacant", listed: false, tone: "stone", type: "Boarding house" },
+  { id: "room-11", name: "Studio 11A", property: "Mabini Residences", price: 11200, status: "Under maintenance", listed: false, tone: "sand", type: "Apartment" },
+  { id: "room-12", name: "Garden suite", property: "Acacia House", price: 8400, status: "Vacant", listed: true, tone: "clay", type: "House" },
 ];
 
 export const dashboardCopy = {
@@ -43,7 +42,6 @@ export const dashboardFilterOptions = {
   statuses: ["Vacant", "Occupied", "Under maintenance"] as const,
   types: ["Boarding house", "Apartment", "House"] as const,
   properties: ["Willow Boarding House", "Mabini Residences", "Acacia House"],
-  inclusions: ["Water", "Wifi", "Electricity", "Aircon"],
   tabs: ["All", "Vacant", "Occupied", "Unavailable"] as const,
 };
 
@@ -77,8 +75,7 @@ export const dashboardUiCopy = {
   closeDetails: "Close room details",
   expandDetails: "Expand room details",
   roomDetail: "Room detail",
-  description: { title: "Description", subtitle: "Price, size, and rules" },
-  inclusionDetails: { title: "Inclusions", subtitle: "Water, wifi, and more" },
+  description: { title: "Description", subtitle: "Size and rules" },
   photos: { title: "Photos", subtitle: "Manage room images" },
   listing: { title: "Listing", subtitle: "Publish or hide" },
   stats: [
@@ -97,11 +94,4 @@ export const dashboardUiCopy = {
   statusGroups: "Status",
   typeGroup: "Property type",
   propertyGroup: "Property",
-  priceGroup: "Price range",
-  inclusionsGroup: "Inclusions",
-  priceFrom: "From",
-  priceTo: "To",
-  minimumPrice: "Minimum price per month",
-  maximumPrice: "Maximum price per month",
-  maxPrice: "Maximum price per month",
 } as const;

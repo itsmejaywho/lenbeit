@@ -1394,11 +1394,6 @@ select:focus-visible {
 .dashboard-filter-option > span:first-child { min-width: 0; display: flex; align-items: center; gap: 8px; }
 .dashboard-filter-option input { width: 15px; height: 15px; flex: 0 0 auto; margin: 0; accent-color: var(--text); }
 .dashboard-filter-count { color: #85817a; font-variant-numeric: tabular-nums; }
-.dashboard-price-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.dashboard-price-inputs label { display: grid; gap: 5px; color: var(--muted); font-size: 11px; }
-.dashboard-price-inputs input { width: 100%; min-width: 0; height: 36px; padding: 0 8px; border: 1px solid var(--border); border-radius: 8px; background: white; color: var(--text); font: inherit; font-size: 12px; }
-.dashboard-range-label { color: var(--muted); font-size: 11px; }
-.dashboard-range { width: 100%; accent-color: var(--text); }
 .dashboard-clear-filters { position: sticky; bottom: 0; flex: 0 0 auto; align-self: flex-start; margin-top: auto; padding: 12px 0 4px; border: 0; background: var(--surface); color: var(--muted); font: inherit; font-size: 12px; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
 .dashboard-clear-filters:hover { color: var(--text); }
 
