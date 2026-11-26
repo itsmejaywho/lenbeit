@@ -32,14 +32,17 @@ async function CheckEmailContent({ searchParams }: CheckEmailPageProps) {
 
   return (
     <AuthCard
+      align="center"
       heading="Check your email"
       description={`We sent a confirmation link to ${email}. Click it to activate your account.`}
       icon={<MailIcon />}
     >
       <div className="check-email-actions">
         <ResendEmailButton />
-        <p><Link href={registerHref}>Wrong email? Go back</Link></p>
-        <p><Link href={loginHref}>Back to login</Link></p>
+        <div className="check-email-links" style={{ display: "grid", gap: 6 }}>
+          <p><Link href={registerHref}>Wrong email? Go back</Link></p>
+          <p><Link href={loginHref}>Back to login</Link></p>
+        </div>
         <p className="check-email-note">Didn&apos;t get it? Check your spam folder.</p>
       </div>
     </AuthCard>
@@ -48,7 +51,7 @@ async function CheckEmailContent({ searchParams }: CheckEmailPageProps) {
 
 export default function CheckEmailPage({ searchParams }: CheckEmailPageProps) {
   return (
-    <Suspense fallback={<AuthCard heading="Check your email" description="We sent a confirmation link to your email address. Click it to activate your account." icon={<MailIcon />}><div className="auth-query-fallback auth-query-fallback-check" aria-hidden="true" /></AuthCard>}>
+    <Suspense fallback={<AuthCard align="center" heading="Check your email" description="We sent a confirmation link to your email address. Click it to activate your account." icon={<MailIcon />}><div className="auth-query-fallback auth-query-fallback-check" aria-hidden="true" /></AuthCard>}>
       <CheckEmailContent searchParams={searchParams} />
     </Suspense>
   );

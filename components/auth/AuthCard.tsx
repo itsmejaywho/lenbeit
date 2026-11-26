@@ -7,12 +7,18 @@ type AuthCardProps = {
   description: string;
   children: ReactNode;
   icon?: ReactNode;
+  variant?: "register";
+  align?: "center";
 };
 
-export function AuthCard({ heading, description, children, icon }: AuthCardProps) {
+export function AuthCard({ heading, description, children, icon, variant, align }: AuthCardProps) {
   return (
-    <main className="login-page">
-      <section className="login-card" aria-labelledby="auth-card-heading">
+    <main className={`login-page${variant === "register" ? " login-page-register" : ""}`}>
+      <section
+        className={`login-card${align === "center" ? " login-card-center" : ""}`}
+        style={align === "center" ? { textAlign: "center" } : undefined}
+        aria-labelledby="auth-card-heading"
+      >
         <Link className="brand login-brand" href="/" aria-label={landingPageContent.brand}>
           <span className="brand-mark" aria-hidden="true">{landingPageContent.brand.charAt(0)}</span>
           <span>{landingPageContent.brand}</span>
@@ -20,7 +26,11 @@ export function AuthCard({ heading, description, children, icon }: AuthCardProps
         {icon && <div className="auth-card-icon">{icon}</div>}
         <header className="login-heading">
           <h1 id="auth-card-heading">{heading}</h1>
-          <p>{description}</p>
+          <p
+            style={align === "center" ? { maxWidth: "34ch", marginInline: "auto", overflowWrap: "anywhere" } : undefined}
+          >
+            {description}
+          </p>
         </header>
         {children}
       </section>

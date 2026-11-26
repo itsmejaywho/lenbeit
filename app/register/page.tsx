@@ -16,8 +16,9 @@ async function RegisterContent({ searchParams }: RegisterPageProps) {
 export default function RegisterPage({ searchParams }: RegisterPageProps) {
   return (
     <AuthCard
-      heading="Create your landlord account"
-      description="It takes about a minute. You can add your property details after confirming your email."
+      variant="register"
+      heading="Create your account"
+      description="It takes about a minute. Add your property details after confirming your email."
     >
       <Suspense fallback={<div className="auth-query-fallback auth-query-fallback-register" aria-hidden="true" />}>
         <RegisterContent searchParams={searchParams} />
