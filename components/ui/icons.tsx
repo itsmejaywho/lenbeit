@@ -128,7 +128,27 @@ export function PlusIcon(props: IconProps) {
 }
 
 export function MoreIcon(props: IconProps) {
-  return <IconFrame {...props}><circle cx="5" cy="12" r="1" fill="currentColor" /><circle cx="12" cy="12" r="1" fill="currentColor" /><circle cx="19" cy="12" r="1" fill="currentColor" /></IconFrame>;
+  return <IconFrame {...props}><circle cx="5" cy="12" r="1.75" fill="currentColor" stroke="none" /><circle cx="12" cy="12" r="1.75" fill="currentColor" stroke="none" /><circle cx="19" cy="12" r="1.75" fill="currentColor" stroke="none" /></IconFrame>;
+}
+
+export function EditIcon(props: IconProps) {
+  return <IconFrame {...props}><path d="m14 5 5 5M4 20l4.2-.8L19 8.4 15.6 5 4.8 15.8 4 20Z" /></IconFrame>;
+}
+
+export function PublishIcon(props: IconProps) {
+  return <IconFrame {...props}><path d="M12 16V4m-4 4 4-4 4 4M5 14v5h14v-5" /></IconFrame>;
+}
+
+export function UnpublishIcon(props: IconProps) {
+  return <IconFrame {...props}><path d="M12 4v12m4-4-4 4-4-4M5 14v5h14v-5" /></IconFrame>;
+}
+
+export function DuplicateIcon(props: IconProps) {
+  return <IconFrame {...props}><rect x="8" y="8" width="12" height="12" rx="2" /><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2" /></IconFrame>;
+}
+
+export function ArchiveIcon(props: IconProps) {
+  return <IconFrame {...props}><path d="M4 7h16l-1 14H5L4 7ZM3 3h18v4H3zM10 11h4" /></IconFrame>;
 }
 
 export function LockIcon(props: IconProps) {

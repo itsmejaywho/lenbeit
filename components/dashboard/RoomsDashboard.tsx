@@ -4,13 +4,14 @@ import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type ReactNod
 import { dashboardFilterOptions, dashboardRooms, dashboardUiCopy, type DashboardRoom, type RoomStatus } from "../../lib/dashboard-placeholder";
 import { Placeholder } from "../Placeholder";
 import { Dropdown } from "../ui/Dropdown";
-import { BoxIcon, ChatIcon, ChevronIcon, ChevronRightIcon, ClockIcon, EyeIcon, ExpandIcon, FilterIcon, MoreIcon, PlusIcon, SearchIcon, TagIcon, WaterIcon } from "../ui/icons";
+import { ArchiveIcon, BoxIcon, ChatIcon, CheckIcon, ChevronIcon, ChevronRightIcon, ClockIcon, DuplicateIcon, EditIcon, EyeIcon, ExpandIcon, FilterIcon, MoreIcon, PeopleIcon, PlusIcon, PublishIcon, SearchIcon, TagIcon, UnpublishIcon, WaterIcon } from "../ui/icons";
 
 type RoomTab = typeof dashboardFilterOptions.tabs[number];
 type FilterState = { statuses: RoomStatus[]; types: string[]; properties: string[]; inclusions: string[]; from: string; to: string; search: string };
 
 const initialFilters: FilterState = { statuses: [], types: [], properties: [], inclusions: [], from: "", to: "", search: "" };
 const statIcons = { chat: ChatIcon, eye: EyeIcon, clock: ClockIcon };
+const ROOM_CARD_IMAGE_RATIO = "16 / 10";
 
 function FilterGroup({ title, children, initiallyOpen = true }: { title: string; children: ReactNode; initiallyOpen?: boolean }) {
   const [open, setOpen] = useState(initiallyOpen);
@@ -85,24 +86,28 @@ function RoomCard({ room, selected, onSelect }: { room: DashboardRoom; selected:
   const statusClass = room.status === "Vacant" ? "vacant" : room.status === "Occupied" ? "occupied" : "maintenance";
   const statusLabel = room.status === "Under maintenance" ? "Maintenance" : room.status;
   const moreItems = [
-    { id: "edit", label: "Edit room" },
-    { id: "duplicate", label: "Duplicate" },
-    { id: "archive", label: "Archive", variant: "danger" as const, dividerBefore: true },
+    { id: "edit", label: "Edit room", icon: <EditIcon /> },
+    { id: "publish", label: room.listed ? "Unpublish" : "Publish", icon: room.listed ? <UnpublishIcon /> : <PublishIcon /> },
+    { id: "status", label: room.status === "Vacant" ? "Mark as occupied" : "Mark as vacant", icon: room.status === "Vacant" ? <PeopleIcon /> : <CheckIcon /> },
+    { id: "duplicate", label: "Duplicate", icon: <DuplicateIcon /> },
+    { id: "archive", label: "Archive", icon: <ArchiveIcon />, variant: "danger" as const, dividerBefore: true },
   ];
   return (
     <article className={`dashboard-room-card${selected ? " is-selected" : ""}`}>
       <button className="dashboard-room-card-main" type="button" aria-label={`${room.name}, ${room.status}, ₱${room.price.toLocaleString()} per month. ${dashboardUiCopy.viewDetails}`} aria-pressed={selected} onClick={() => onSelect(room)}>
         <div className={`dashboard-room-visual dashboard-room-visual-${room.tone}`}>
-          <Placeholder tone={room.tone} ratio="1.55" />
-          <span className="dashboard-room-badge">{room.listed ? dashboardUiCopy.listed : dashboardUiCopy.draft}</span>
+          <Placeholder tone={room.tone} ratio={ROOM_CARD_IMAGE_RATIO} />
           <span className="dashboard-room-visual-caption">{room.property}</span>
         </div>
         <span className="dashboard-room-info">
           <span className="dashboard-room-name">{room.name}</span>
-          <span className="dashboard-room-meta"><span>₱{room.price.toLocaleString()} / month</span><span className={`dashboard-status-pill is-${statusClass}`}>{statusLabel} (1)</span></span>
+          <span className="dashboard-room-meta"><span>₱{room.price.toLocaleString()} / month</span><span className={`dashboard-status-pill is-${statusClass}`}>{statusLabel}</span></span>
         </span>
       </button>
-      <Dropdown className="dashboard-room-menu" items={moreItems} trigger={<MoreIcon />} aria-label={`More options for ${room.name}`} variant="inline" />
+      <div className="dashboard-room-visual-topline">
+        <span className="dashboard-room-badge">{room.listed ? dashboardUiCopy.listed : dashboardUiCopy.draft}</span>
+        <Dropdown className="dashboard-room-menu" items={moreItems} trigger={<MoreIcon />} aria-label="Room actions" variant="icon" align="right" />
+      </div>
     </article>
   );
 }
@@ -125,8 +130,8 @@ function RoomDetail({ room, open, onClose, onExpand, expanded }: { room: Dashboa
         </div>
         <div className="dashboard-detail-content">
           <div className={`dashboard-detail-visual dashboard-room-visual-${room.tone}`}>
-            <Placeholder tone={room.tone} ratio="1.4" />
-            <div className="dashboard-detail-visual-caption"><strong>{room.name}</strong><span className={`dashboard-status-pill is-${statusClass}`}>{room.status}</span></div>
+            <Placeholder tone={room.tone} ratio="4 / 3" />
+            <div className="dashboard-detail-visual-caption"><strong>{room.name}</strong><span className={`dashboard-status-pill is-${statusClass}`}>{room.status === "Under maintenance" ? "Maintenance" : room.status}</span></div>
           </div>
           <div className="dashboard-detail-stats">
             {dashboardUiCopy.stats.map((stat) => {

@@ -43,7 +43,7 @@ export type DropdownItem = {
 
 type DropdownProps = {
   items: readonly DropdownItem[];
-  variant?: "boxed" | "inline";
+  variant?: "boxed" | "inline" | "icon";
   label?: string;
   value?: string;
   onChange?: (value: string) => void;
@@ -93,6 +93,9 @@ export function Dropdown({
   const [open, setOpen] = useState(false);
   const [position, setPosition] = useState<Position | null>(null);
   const selectedLabel = items.find((item) => item.id === value)?.label;
+  // "icon" must not produce "shared-dropdown-icon": that class is the menu-item
+  // icon slot and its svg sizing would leak onto this wrapper.
+  const variantClass = variant === "icon" ? "shared-dropdown-icon-variant" : `shared-dropdown-${variant}`;
 
   const updatePosition = useCallback(() => {
     const triggerElement = triggerRef.current;
@@ -158,6 +161,7 @@ export function Dropdown({
     if (selectStyle) onChange?.(item.id);
     item.onSelect?.();
     setOpen(false);
+    triggerRef.current?.focus();
   };
 
   const handleKeyDown = (event: KeyboardEvent<HTMLButtonElement | HTMLDivElement>) => {
@@ -255,18 +259,20 @@ export function Dropdown({
     : null;
 
   return (
-    <div className={`shared-dropdown shared-dropdown-${variant} ${className}`} ref={rootRef} style={themeVariables} onKeyDown={handleKeyDown}>
+    <div className={`shared-dropdown ${variantClass} ${className}`} ref={rootRef} style={themeVariables} onKeyDown={handleKeyDown}>
       <button
         aria-haspopup={selectStyle ? "listbox" : "menu"}
         aria-expanded={open}
         aria-controls={menuId}
         aria-label={ariaLabel}
-        className={`shared-dropdown-trigger${variant === "inline" ? " shared-dropdown-trigger-inline" : ""}`}
-        onClick={() => setOpen((current) => !current)}
+        className={`shared-dropdown-trigger${variant === "inline" ? " shared-dropdown-trigger-inline" : ""}${variant === "icon" ? " shared-dropdown-trigger-icon" : ""}`}
+        onClick={(event) => { event.stopPropagation(); setOpen((current) => !current); }}
         ref={triggerRef}
         type="button"
       >
-        {variant === "inline" ? (
+        {variant === "icon" ? (
+          customTrigger
+        ) : variant === "inline" ? (
           <span className="shared-dropdown-inline-content">
             {label && <span className="shared-dropdown-inline-label">{label}</span>}
             <span className="shared-dropdown-inline-value">{customTrigger}</span>

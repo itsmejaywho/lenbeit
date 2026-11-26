@@ -40,6 +40,7 @@ export function DashboardAccountMenu({ userStatus, location }: { userStatus: Das
         trigger={trigger}
         aria-label="Account menu"
         align={location === "header" ? "right" : "left"}
+        placement={location === "header" ? undefined : "right-end"}
         variant="inline"
       />
     </div>
