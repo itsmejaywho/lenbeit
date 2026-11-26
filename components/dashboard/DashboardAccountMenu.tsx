@@ -39,7 +39,7 @@ export function DashboardAccountMenu({ userStatus, location }: { userStatus: Das
         items={items}
         trigger={trigger}
         aria-label="Account menu"
-        align={location === "header" ? "right" : "left"}
+        placement={location === "sidebar" ? "right-end" : "bottom-end"}
         variant="inline"
       />
     </div>

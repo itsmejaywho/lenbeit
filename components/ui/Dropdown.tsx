@@ -44,6 +44,7 @@ export type DropdownItem = {
 type DropdownProps = {
   items: readonly DropdownItem[];
   variant?: "boxed" | "inline" | "icon";
+  placement?: "bottom-start" | "bottom-end" | "right-end";
   label?: string;
   value?: string;
   onChange?: (value: string) => void;
@@ -74,6 +75,7 @@ const themeVariables = {
 export function Dropdown({
   items,
   variant = "boxed",
+  placement,
   label,
   value,
   onChange,
@@ -97,17 +99,19 @@ export function Dropdown({
   // icon slot and its svg sizing would leak onto this wrapper.
   const variantClass = variant === "icon" ? "shared-dropdown-icon-variant" : `shared-dropdown-${variant}`;
 
+  const showMenu = () => {
+    setPosition(null);
+    setOpen(true);
+  };
+
   const updatePosition = useCallback(() => {
     const triggerElement = triggerRef.current;
     if (!triggerElement) return;
     const rect = triggerElement.getBoundingClientRect();
     const gap = 8;
     const viewportPadding = 8;
-    const menuHeight = menuRef.current?.scrollHeight ?? 280;
-    const availableBelow = window.innerHeight - rect.bottom - gap - viewportPadding;
-    const availableAbove = rect.top - gap - viewportPadding;
-    const flipUp = availableBelow < Math.min(menuHeight, 180) && availableAbove > availableBelow;
-    const maxHeight = Math.max(44, flipUp ? availableAbove : availableBelow);
+    const menuHeight = menuRef.current?.getBoundingClientRect().height ?? 280;
+    const resolvedPlacement = placement ?? (align === "right" ? "bottom-end" : "bottom-start");
     const canvas = document.createElement("canvas");
     const context = canvas.getContext("2d");
     const fontSize = window.innerWidth < 768 ? 16 : 14;
@@ -122,14 +126,32 @@ export function Dropdown({
       window.innerWidth - viewportPadding * 2,
       Math.max(rect.width, 180, naturalWidth),
     );
-    const left = align === "right" ? rect.right - width : rect.left;
+    const availableBelow = window.innerHeight - rect.bottom - gap - viewportPadding;
+    const availableAbove = rect.top - gap - viewportPadding;
+    const availableRight = window.innerWidth - rect.right - gap - viewportPadding;
+    const availableLeft = rect.left - gap - viewportPadding;
+    const flipUp = resolvedPlacement !== "right-end"
+      && availableBelow < Math.min(menuHeight, 180)
+      && availableAbove > availableBelow;
+    const flipLeft = resolvedPlacement === "right-end"
+      && availableRight < width
+      && availableLeft > availableRight;
+    const maxHeight = resolvedPlacement === "right-end"
+      ? Math.max(44, rect.bottom - viewportPadding)
+      : Math.max(44, flipUp ? availableAbove : availableBelow);
+    const left = resolvedPlacement === "right-end"
+      ? flipLeft ? rect.left - gap - width : rect.right + gap
+      : resolvedPlacement === "bottom-end" ? rect.right - width : rect.left;
+    const preferredTop = resolvedPlacement === "right-end"
+      ? rect.bottom - Math.min(menuHeight, maxHeight)
+      : flipUp ? rect.top - gap - Math.min(menuHeight, maxHeight) : rect.bottom + gap;
     setPosition({
-      top: flipUp ? rect.top - gap - Math.min(menuHeight, maxHeight) : rect.bottom + gap,
+      top: Math.max(viewportPadding, Math.min(preferredTop, window.innerHeight - Math.min(menuHeight, maxHeight) - viewportPadding)),
       left: Math.max(viewportPadding, Math.min(left, window.innerWidth - width - viewportPadding)),
       width,
       maxHeight,
     });
-  }, [align, items, selectStyle, variant]);
+  }, [align, items, placement, selectStyle, variant]);
 
   useLayoutEffect(() => {
     if (!open) return;
@@ -177,7 +199,7 @@ export function Dropdown({
       setOpen(false);
     } else if (event.key === "ArrowDown" || event.key === "ArrowUp" || event.key === "Home" || event.key === "End") {
       event.preventDefault();
-      if (!open) setOpen(true);
+      if (!open) showMenu();
       const nextIndex = event.key === "Home"
         ? 0
         : event.key === "End"
@@ -202,9 +224,9 @@ export function Dropdown({
   const customTrigger = isValidElement(triggerContent)
     ? cloneElement(triggerContent, { "aria-hidden": true } as Record<string, unknown>)
     : triggerContent;
-  const portalMenu = open && position && typeof document !== "undefined"
+  const portalMenu = open && typeof document !== "undefined"
     ? createPortal(
-        <div
+      <div
           className={`shared-dropdown-menu${variant === "inline" ? " shared-dropdown-menu-inline" : ""}`}
           id={menuId}
           ref={menuRef}
@@ -217,10 +239,11 @@ export function Dropdown({
           style={{
             ...themeVariables,
             position: "fixed",
-            top: position.top,
-            left: position.left,
-            width: position.width,
-            maxHeight: position.maxHeight,
+            top: position?.top ?? 0,
+            left: position?.left ?? 0,
+            width: position?.width,
+            maxHeight: position?.maxHeight,
+            visibility: position ? "visible" : "hidden",
           } as CSSProperties}
         >
           {items.map((item, index) => {
@@ -266,7 +289,7 @@ export function Dropdown({
         aria-controls={menuId}
         aria-label={ariaLabel}
         className={`shared-dropdown-trigger${variant === "inline" ? " shared-dropdown-trigger-inline" : ""}${variant === "icon" ? " shared-dropdown-trigger-icon" : ""}`}
-        onClick={(event) => { event.stopPropagation(); setOpen((current) => !current); }}
+        onClick={(event) => { event.stopPropagation(); if (open) setOpen(false); else showMenu(); }}
         ref={triggerRef}
         type="button"
       >
