@@ -1419,7 +1419,7 @@ select:focus-visible {
 .dashboard-room-visual-topline { position: absolute; z-index: 3; top: 13px; right: 13px; left: 13px; display: flex; align-items: center; justify-content: space-between; pointer-events: none; }
 .dashboard-room-badge { min-height: 32px; display: inline-flex; align-items: center; padding: 5px 8px; border: 1px solid rgb(255 255 255 / 80%); border-radius: 999px; background: #fff; color: var(--text); font-size: 10px; font-weight: 700; pointer-events: none; }
 .dashboard-room-menu { position: relative; z-index: 3; width: 32px !important; flex: 0 0 auto; pointer-events: auto; }
-.dashboard-room-menu .shared-dropdown-trigger { width: 32px; height: 32px; min-height: 32px; }
+.dashboard-room-menu .shared-dropdown-trigger { width: 32px; height: 32px; min-height: 32px; display: inline-flex; align-items: center; justify-content: center; gap: 0; padding: 0; }
 .dashboard-room-visual-caption { position: absolute; right: 0; bottom: 0; left: 0; display: block; padding: 21px 10px 8px; background: linear-gradient(transparent, rgb(26 26 26 / 52%)); color: white; font-size: 11px; font-weight: 600; }
 .dashboard-room-info { display: grid; gap: 10px; padding: 12px 12px 13px; }
 .dashboard-room-name { overflow: hidden; color: var(--text); font-size: 13px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
