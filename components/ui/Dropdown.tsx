@@ -45,6 +45,7 @@ type DropdownProps = {
   items: readonly DropdownItem[];
   variant?: "boxed" | "inline" | "icon";
   placement?: "bottom-start" | "bottom-end" | "right-end";
+  id?: string;
   label?: string;
   value?: string;
   onChange?: (value: string) => void;
@@ -53,6 +54,9 @@ type DropdownProps = {
   trigger?: ReactNode;
   className?: string;
   "aria-label"?: string;
+  "aria-labelledby"?: string;
+  "aria-describedby"?: string;
+  onBlur?: () => void;
 };
 
 type Position = { top: number; left: number; width: number; maxHeight: number };
@@ -76,6 +80,7 @@ export function Dropdown({
   items,
   variant = "boxed",
   placement,
+  id,
   label,
   value,
   onChange,
@@ -84,6 +89,9 @@ export function Dropdown({
   trigger,
   className = "",
   "aria-label": ariaLabel,
+  "aria-labelledby": ariaLabelledBy,
+  "aria-describedby": ariaDescribedBy,
+  onBlur,
 }: DropdownProps) {
   const selectStyle = onChange !== undefined;
   const generatedId = useId();
@@ -284,12 +292,16 @@ export function Dropdown({
   return (
     <div className={`shared-dropdown ${variantClass} ${className}`} ref={rootRef} style={themeVariables} onKeyDown={handleKeyDown}>
       <button
+        id={id}
         aria-haspopup={selectStyle ? "listbox" : "menu"}
         aria-expanded={open}
         aria-controls={menuId}
         aria-label={ariaLabel}
+        aria-labelledby={ariaLabelledBy}
+        aria-describedby={ariaDescribedBy}
         className={`shared-dropdown-trigger${variant === "inline" ? " shared-dropdown-trigger-inline" : ""}${variant === "icon" ? " shared-dropdown-trigger-icon" : ""}`}
         onClick={(event) => { event.stopPropagation(); if (open) setOpen(false); else showMenu(); }}
+        onBlur={onBlur}
         ref={triggerRef}
         type="button"
       >

@@ -4,8 +4,8 @@ import { useRef, useState } from "react";
 
 export type FieldValidator = (value: string) => string | null;
 
-export function useFormField(validate: FieldValidator) {
-  const [value, setValue] = useState("");
+export function useFormField(validate: FieldValidator, initialValue = "") {
+  const [value, setValue] = useState(initialValue);
   const [error, setError] = useState<string | null>(null);
   const [validAfterBlur, setValidAfterBlur] = useState(false);
   const validateOnChange = useRef(false);

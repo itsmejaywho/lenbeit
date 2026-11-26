@@ -14,8 +14,12 @@ export default function DashboardOverviewPage() {
       ? "not_submitted"
       : userStatus.verificationStatus;
   const approved = userStatus.emailVerified && userStatus.verificationStatus === "approved";
+  const title = approved ? dashboardCopy.overview.title : "Overview";
+  const subtitle = approved
+    ? dashboardCopy.overview.subtitle
+    : "Complete your verification to start listing.";
   return (
-    <DashboardPage title={dashboardCopy.overview.title} subtitle={dashboardCopy.overview.subtitle} userStatus={userStatus}>
+    <DashboardPage title={title} subtitle={subtitle} userStatus={userStatus}>
       {approved ? <RoomsDashboard /> : <DashboardStatusCard status={status} />}
     </DashboardPage>
   );

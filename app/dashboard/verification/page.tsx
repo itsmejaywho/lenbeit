@@ -1,6 +1,5 @@
-import { DashboardPlaceholderRoute } from "../../../components/dashboard/DashboardPlaceholderRoute";
-import { dashboardCopy } from "../../../lib/dashboard-placeholder";
+import { VerificationDashboard } from "../../../components/dashboard/VerificationDashboard";
 
 export default function VerificationPage() {
-  return <DashboardPlaceholderRoute page={dashboardCopy.verification} href="/dashboard" />;
+  return <VerificationDashboard />;
 }
