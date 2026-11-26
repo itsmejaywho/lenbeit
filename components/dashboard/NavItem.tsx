@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, type KeyboardEvent } from "react";
 import type { DashboardNavItem } from "../../lib/dashboard-nav";
 import type { DashboardUserStatus } from "../../lib/mock-user";
 import { DashboardNavIcon, LockIcon } from "../ui/icons";
@@ -26,7 +26,7 @@ function lockMessage(item: DashboardNavItem, userStatus: DashboardUserStatus) {
 }
 
 export function NavItem({ item, currentPath, userStatus, mode }: NavItemProps) {
-  const [showLockedMessage, setShowLockedMessage] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(false);
   const active = isActive(item, currentPath);
   const message = lockMessage(item, userStatus);
   const locked = Boolean(message);
@@ -37,16 +37,24 @@ export function NavItem({ item, currentPath, userStatus, mode }: NavItemProps) {
     `dashboard-nav-item-${mode}`,
     active ? "is-active" : "",
     locked ? "is-locked" : "",
-    showLockedMessage ? "show-message" : "",
+    showTooltip ? "show-message" : "",
   ].filter(Boolean).join(" ");
   const commonProps = {
     className: classes,
     "aria-label": item.label,
     "aria-current": active ? "page" as const : undefined,
-    "aria-describedby": locked && showLockedMessage ? tooltipId : undefined,
-    title: locked ? message : undefined,
-    onClick: locked ? () => setShowLockedMessage((shown) => !shown) : undefined,
-    onBlur: () => setShowLockedMessage(false),
+    "aria-describedby": locked && showTooltip ? tooltipId : undefined,
+    onMouseEnter: () => setShowTooltip(true),
+    onMouseLeave: () => setShowTooltip(false),
+    onFocus: () => setShowTooltip(true),
+    onBlur: () => setShowTooltip(false),
+    onClick: () => setShowTooltip(false),
+    onKeyDown: (event: KeyboardEvent<HTMLElement>) => {
+      if (event.key === "Escape") {
+        setShowTooltip(false);
+        event.currentTarget.blur();
+      }
+    },
   };
 
   return (

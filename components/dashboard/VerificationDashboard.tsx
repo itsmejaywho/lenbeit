@@ -260,7 +260,8 @@ function openFilePicker(event: KeyboardEvent<HTMLLabelElement>, inputRef: RefObj
       userStatus={userStatus}
     >
       <div className="verification-page">
-        {isUnverified ? (
+        <div className="verification-content">
+          {isUnverified ? (
           <div className="verification-single-card">
             <DetailCard icon={<MailIcon />} title="Please confirm your email">
               <p className="verification-body-copy">Confirm your email address before submitting your verification details.</p>
@@ -293,12 +294,12 @@ function openFilePicker(event: KeyboardEvent<HTMLLabelElement>, inputRef: RefObj
               <div className="verification-columns">
                 <div className="verification-column">
                   <DetailCard icon={<UserIcon />} title="Personal information" action={idEditAction}>
-                    <div className="verification-fields-grid">
-                      <DetailField label={editable ? "" : "Full name as shown on your ID"}>
-                        {editable ? <AuthField id="verification-full-name" label="Full name as shown on your ID" autoComplete="name" value={fullName.value} error={fullName.error} validAfterBlur={fullName.validAfterBlur} required inputRef={nameInputRef} onChange={fullName.handleChange} onBlur={fullName.handleBlur} /> : <span>{fullName.value}</span>}
+                    <div className="verification-fields-grid verification-personal-fields">
+                      <DetailField label={editable ? "" : "Full name (as on your ID) *"}>
+                        {editable ? <AuthField id="verification-full-name" label="Full name (as on your ID) *" autoComplete="name" value={fullName.value} error={fullName.error} validAfterBlur={fullName.validAfterBlur} required inputRef={nameInputRef} onChange={fullName.handleChange} onBlur={fullName.handleBlur} /> : <span>{fullName.value}</span>}
                       </DetailField>
-                      <DetailField label={editable ? "" : "Landline or business number"} hint="Helps us confirm you by phone.">
-                        {editable ? <AuthField id="verification-landline" label="Landline or business number" type="tel" autoComplete="tel" inputMode="tel" value={landline.value} error={landline.error} validAfterBlur={landline.validAfterBlur} onChange={landline.handleChange} onBlur={landline.handleBlur} /> : <span>{landline.value || "Not provided"}</span>}
+                      <DetailField label={editable ? "" : "Landline or business number (optional)"} hint="Helps us confirm you by phone.">
+                        {editable ? <AuthField id="verification-landline" label="Landline or business number (optional)" type="tel" autoComplete="tel" inputMode="tel" value={landline.value} error={landline.error} validAfterBlur={landline.validAfterBlur} onChange={landline.handleChange} onBlur={landline.handleBlur} /> : <span>{landline.value || "Not provided"}</span>}
                       </DetailField>
                     </div>
                   </DetailCard>
@@ -396,8 +397,8 @@ function openFilePicker(event: KeyboardEvent<HTMLLabelElement>, inputRef: RefObj
                           </div>
                         )}
                       </DetailField>
-                      <DetailField label={editable ? "" : "Address shown on your document"} hint="Helps us match it to the property you add.">
-                        {editable ? <AuthField id="verification-document-address" label="Address shown on your document" autoComplete="street-address" value={documentAddress.value || (isRejected ? copy.documentAddress : "")} onChange={documentAddress.handleChange} onBlur={documentAddress.handleBlur} /> : <span>{documentAddress.value || copy.documentAddress}</span>}
+                      <DetailField label={editable ? "" : "Address shown on your document (optional)"} hint="Helps us match it to the property you add.">
+                        {editable ? <AuthField id="verification-document-address" label="Address shown on your document (optional)" autoComplete="street-address" value={documentAddress.value || (isRejected ? copy.documentAddress : "")} onChange={documentAddress.handleChange} onBlur={documentAddress.handleBlur} /> : <span>{documentAddress.value || copy.documentAddress}</span>}
                       </DetailField>
                     </div>
                   </DetailCard>
@@ -433,7 +434,8 @@ function openFilePicker(event: KeyboardEvent<HTMLLabelElement>, inputRef: RefObj
               {editable && <div className="verification-submit-bar"><button className="button button-dark verification-submit-button" type="submit" disabled={submitting}>{submitting ? "Submitting..." : isRejected ? "Resubmit for review" : "Submit for review"}</button></div>}
             </form>
           </>
-        )}
+          )}
+        </div>
       </div>
     </DashboardPage>
   );
