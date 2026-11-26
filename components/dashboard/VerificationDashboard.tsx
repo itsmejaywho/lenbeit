@@ -100,6 +100,8 @@ export function VerificationDashboard() {
   const isReadOnly = status === "pending" || status === "approved";
   const isRejected = status === "rejected";
   const editable = !isReadOnly;
+  const showSubmitAction = status === "not_submitted" || isRejected;
+  const showDashboardAction = status === "approved";
   const chip = statusInfo(status);
   const fullName = useFormField(validateFullName, userStatus.name);
   const landline = useFormField(validateLandline);
@@ -196,6 +198,12 @@ function openFilePicker(event: KeyboardEvent<HTMLLabelElement>, inputRef: RefObj
     }
   }
 
+function focusInvalidField(target: HTMLElement | null) {
+  if (!target) return;
+  target.focus({ preventScroll: true });
+  target.scrollIntoView({ block: "center", inline: "nearest" });
+}
+
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (submitLock.current || !editable) return;
@@ -207,31 +215,31 @@ function openFilePicker(event: KeyboardEvent<HTMLLabelElement>, inputRef: RefObj
     const confirmError = agreement.validateForSubmit();
     setAgreementError(confirmError ?? "");
     if (nameError) {
-      nameInputRef.current?.focus();
+      focusInvalidField(nameInputRef.current);
       return;
     }
     if (phoneError) {
-      document.getElementById("verification-landline")?.focus();
+      focusInvalidField(document.getElementById("verification-landline"));
       return;
     }
     if (idTypeError) {
-      document.getElementById("verification-id-type")?.focus();
+      focusInvalidField(document.getElementById("verification-id-type"));
       return;
     }
     if (idRequiredError || (!idFile && !idIsExisting)) {
-      document.getElementById("verification-id-upload-target")?.focus();
+      focusInvalidField(document.getElementById("verification-id-upload-target"));
       return;
     }
     if (proofTypeError) {
-      document.getElementById("verification-proof-type")?.focus();
+      focusInvalidField(document.getElementById("verification-proof-type"));
       return;
     }
     if (proofRequiredError || (!proofFiles.length && !proofIsExisting)) {
-      document.getElementById("verification-proof-upload-target")?.focus();
+      focusInvalidField(document.getElementById("verification-proof-upload-target"));
       return;
     }
     if (confirmError) {
-      agreementInputRef.current?.focus();
+      focusInvalidField(agreementInputRef.current);
       return;
     }
 
@@ -259,7 +267,7 @@ function openFilePicker(event: KeyboardEvent<HTMLLabelElement>, inputRef: RefObj
       subtitle="Confirm who you are so renters can trust your listings."
       userStatus={userStatus}
     >
-      <div className="verification-page">
+      <div className={`verification-page${showSubmitAction ? " has-sticky-submit" : ""}`}>
         <div className="verification-content">
           {isUnverified ? (
           <div className="verification-single-card">
@@ -283,11 +291,10 @@ function openFilePicker(event: KeyboardEvent<HTMLLabelElement>, inputRef: RefObj
                 <div><dt>Submitted</dt><dd>{submittedDate}</dd></div>
                 <div><dt>Reviewed</dt><dd>{reviewedDate}</dd></div>
               </dl>
-              {editable && <button className="button button-dark verification-summary-submit" type="submit" form="verification-form" disabled={submitting}>{isRejected ? "Resubmit for review" : "Submit for review"}</button>}
             </section>
 
             {status === "pending" && <div className="verification-banner is-pending" role="status">Your verification is under review. We will email you when it is done.</div>}
-            {status === "approved" && <div className="verification-banner is-approved" role="status"><span>You&apos;re verified.</span><Link className="button button-dark" href="/dashboard">Go to dashboard</Link></div>}
+            {status === "approved" && <div className="verification-banner is-approved" role="status"><span>You&apos;re verified.</span></div>}
             {isRejected && <div className="verification-banner is-rejected" role="alert"><strong>We couldn&apos;t approve these details yet.</strong><span>{copy.rejectionReason}</span></div>}
 
             <form id="verification-form" className="verification-form" noValidate onSubmit={handleSubmit}>
@@ -428,10 +435,11 @@ function openFilePicker(event: KeyboardEvent<HTMLLabelElement>, inputRef: RefObj
                     </div>
                     {(agreement.error || agreementError) && <p className="verification-field-error" id="verification-agreement-error" aria-live="polite">{agreement.error || agreementError}</p>}
                   </DetailCard>
+
+                  {showSubmitAction && <div className="verification-submit-bar"><button className="button button-dark verification-submit-button" type="submit" disabled={submitting}>{submitting ? "Submitting..." : isRejected ? "Resubmit for review" : "Submit for review"}</button></div>}
+                  {showDashboardAction && <Link className="button button-dark verification-submit-button verification-dashboard-action" href="/dashboard">Go to dashboard</Link>}
                 </aside>
               </div>
-
-              {editable && <div className="verification-submit-bar"><button className="button button-dark verification-submit-button" type="submit" disabled={submitting}>{submitting ? "Submitting..." : isRejected ? "Resubmit for review" : "Submit for review"}</button></div>}
             </form>
           </>
           )}

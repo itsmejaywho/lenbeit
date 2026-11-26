@@ -1912,7 +1912,8 @@ select:focus-visible {
 
 .verification-summary {
   display: grid;
-  grid-template-columns: max-content minmax(0, 1fr) auto;
+  grid-template-columns: max-content max-content;
+  justify-content: start;
   align-items: center;
   gap: 24px;
   margin-bottom: 18px;
@@ -1936,8 +1937,6 @@ select:focus-visible {
 .verification-status-chip.is-not-submitted, .verification-status-chip.is-pending { border-color: var(--border); background: var(--pending-bg); color: var(--pending-text); }
 .verification-status-chip.is-approved { border-color: var(--success-border); background: var(--success-bg); color: var(--success-text); }
 .verification-status-chip.is-rejected { border-color: var(--danger); background: var(--danger-bg); color: var(--danger); }
-.verification-summary-submit { white-space: nowrap; }
-
 .verification-banner { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 0 0 18px; padding: 13px 16px; border: 1px solid var(--border); border-radius: 12px; background: var(--pending-bg); color: var(--pending-text); font-size: 13px; line-height: 1.5; }
 .verification-banner.is-approved { border-color: var(--success-border); background: var(--success-bg); color: var(--success-text); font-weight: 600; }
 .verification-banner.is-rejected { align-items: flex-start; flex-direction: column; border-color: var(--danger); background: var(--danger-bg); color: var(--danger); }
@@ -2007,9 +2006,10 @@ select:focus-visible {
 .verification-proof-file-icon svg { width: 17px; height: 17px; }
 .verification-proof-file .verification-text-button { flex: 0 0 auto; }
 .verification-add-file { justify-self: start; color: var(--muted); }
-.verification-submit-bar { display: flex; justify-content: flex-end; margin-top: 18px; }
-.verification-submit-button { min-width: 220px; }
-.verification-submit-button:disabled, .verification-summary-submit:disabled { opacity: .65; cursor: wait; }
+.verification-submit-bar { width: 100%; margin-top: 0; }
+.verification-submit-button { width: 100%; min-width: 220px; }
+.verification-dashboard-action { display: flex; justify-content: center; }
+.verification-submit-button:disabled { opacity: .65; cursor: wait; }
 .verification-visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
 @media (min-width: 1024px) {
@@ -2018,10 +2018,12 @@ select:focus-visible {
 }
 
 @media (max-width: 1023px) {
-  .verification-summary { grid-template-columns: minmax(0, 1fr) auto; }
-  .verification-summary-items { grid-column: 1 / -1; grid-row: 2; gap: 32px; padding-left: 0; border-left: 0; }
-  .verification-summary-submit { grid-column: 2; grid-row: 1; justify-self: end; }
+  .verification-summary { grid-template-columns: max-content max-content; }
+  .verification-summary-items { gap: 32px; padding-left: 0; border-left: 0; }
   .verification-columns { grid-template-columns: minmax(0, 1fr) minmax(250px, .8fr); }
+  .verification-page.has-sticky-submit { padding-bottom: calc(68px + env(safe-area-inset-bottom)); }
+  .verification-submit-bar { position: fixed; z-index: 29; right: 16px; bottom: 16px; left: 78px; width: auto; margin: 0; padding: 10px 16px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); box-shadow: var(--shadow-soft); }
+  .verification-submit-button { min-width: 0; }
 }
 
 @media (max-width: 767px) {
@@ -2030,7 +2032,8 @@ select:focus-visible {
   .verification-summary { grid-template-columns: minmax(0, 1fr); gap: 14px; padding: 14px; }
   .verification-summary-items { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-column: auto; grid-row: auto; gap: 8px; }
   .verification-summary-items dd { font-size: 11px; }
-  .verification-summary-submit { width: 100%; grid-column: auto; grid-row: auto; }
+  .verification-summary { grid-template-columns: minmax(0, 1fr); }
+  .verification-summary-items { grid-column: auto; grid-row: auto; }
   .verification-columns { grid-template-columns: minmax(0, 1fr); gap: 14px; }
   .verification-column { gap: 14px; }
   .detail-card { padding: 16px; border-radius: 14px; }
@@ -2038,7 +2041,8 @@ select:focus-visible {
   .detail-card-header h2 { font-size: 14px; }
   .verification-fields-grid { grid-template-columns: minmax(0, 1fr); row-gap: 14px; }
   .verification-banner { align-items: flex-start; flex-direction: column; }
-  .verification-submit-bar { position: sticky; z-index: 20; bottom: 76px; margin: 14px -16px 0; padding: 10px 16px; border-top: 1px solid var(--border); background: var(--surface); }
+  .verification-page.has-sticky-submit { padding-bottom: calc(68px + env(safe-area-inset-bottom)); }
+  .verification-submit-bar { right: 16px; bottom: calc(76px + env(safe-area-inset-bottom)); left: 16px; }
   .verification-submit-button { width: 100%; min-width: 0; }
   .verification-file-actions { gap: 5px; }
 }
