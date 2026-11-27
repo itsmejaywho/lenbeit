@@ -204,7 +204,7 @@ export function RoomFormScreen({ roomId, onFinish }: { roomId?: string; onFinish
       dialogRef.current?.close();
       onFinish(saved);
     } else {
-      router.push(saved ? "/dashboard/rooms?saved=1" : "/dashboard/rooms");
+      router.push(saved ? "/dashboard?saved=1" : "/dashboard");
     }
   }
 

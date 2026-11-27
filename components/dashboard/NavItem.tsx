@@ -15,7 +15,7 @@ type NavItemProps = {
 
 function isActive(item: DashboardNavItem, path: string) {
   return item.href === "/dashboard"
-    ? path === "/dashboard"
+    ? path === "/dashboard" || path.startsWith("/dashboard/rooms/")
     : path === item.href || path.startsWith(`${item.href}/`);
 }
 

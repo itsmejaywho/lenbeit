@@ -7,6 +7,9 @@ const nextConfig: NextConfig = {
   },
   cacheComponents: true,
   partialPrefetching: true,
+  redirects() {
+    return [{ source: "/dashboard/rooms", destination: "/dashboard", permanent: false }];
+  },
   turbopack: {
     rules: {
       "*.css": {

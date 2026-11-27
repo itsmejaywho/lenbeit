@@ -2,5 +2,5 @@ import { DashboardPlaceholderRoute } from "../../../components/dashboard/Dashboa
 import { dashboardCopy } from "../../../lib/dashboard-placeholder";
 
 export default function InquiriesPage() {
-  return <DashboardPlaceholderRoute page={dashboardCopy.inquiries} href="/dashboard/rooms" />;
+  return <DashboardPlaceholderRoute page={dashboardCopy.inquiries} href="/dashboard" />;
 }

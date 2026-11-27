@@ -13,7 +13,6 @@ export type DashboardNavItem = {
 export const dashboardNavItems = [
   { id: "overview", label: "Overview", href: "/dashboard", icon: "home", group: "main", requires: null },
   { id: "verification", label: "Verification", href: "/dashboard/verification", icon: "shield-check", group: "main", requires: null },
-  { id: "rooms", label: "Rooms", href: "/dashboard/rooms", icon: "box", group: "main", requires: "approved" },
   { id: "listings", label: "Listings", href: "/dashboard/listings", icon: "tag", group: "main", requires: "approved", comingSoon: true },
   { id: "inquiries", label: "Inquiries", href: "/dashboard/inquiries", icon: "chat", group: "main", requires: "approved", comingSoon: true },
   { id: "tenants", label: "Tenants and rent", href: "/dashboard/tenants", icon: "people", group: "main", comingSoon: true },

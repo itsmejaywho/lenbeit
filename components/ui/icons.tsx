@@ -195,13 +195,12 @@ export function ClockIcon(props: IconProps) {
   return <IconFrame {...props}><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></IconFrame>;
 }
 
-export type DashboardNavIconName = "home" | "shield-check" | "box" | "tag" | "chat" | "people" | "help" | "settings";
+export type DashboardNavIconName = "home" | "shield-check" | "tag" | "chat" | "people" | "help" | "settings";
 
 export function DashboardNavIcon({ name, ...props }: IconProps & { name: DashboardNavIconName }) {
   switch (name) {
     case "home": return <HomeIcon {...props} />;
     case "shield-check": return <ShieldCheckIcon {...props} />;
-    case "box": return <BoxIcon {...props} />;
     case "tag": return <TagIcon {...props} />;
     case "chat": return <ChatIcon {...props} />;
     case "people": return <PeopleIcon {...props} />;

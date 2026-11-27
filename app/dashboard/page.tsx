@@ -1,13 +1,16 @@
 "use client";
 
+import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 import { DashboardPage } from "../../components/dashboard/DashboardPage";
 import { DashboardStatusCard } from "../../components/dashboard/DashboardStatusCard";
 import { RoomsDashboard } from "../../components/dashboard/RoomsDashboard";
 import { useDashboardUser } from "../../components/dashboard/DashboardContext";
 import { dashboardCopy } from "../../lib/dashboard-placeholder";
 
-export default function DashboardOverviewPage() {
+function DashboardOverviewContent() {
   const { userStatus } = useDashboardUser();
+  const showSavedNotice = Boolean(useSearchParams().get("saved"));
   const status = !userStatus.emailVerified
     ? "unverified"
     : userStatus.verificationStatus === "approved"
@@ -20,7 +23,16 @@ export default function DashboardOverviewPage() {
     : "Complete your verification to start listing.";
   return (
     <DashboardPage title={title} subtitle={subtitle} userStatus={userStatus}>
-      {approved ? <RoomsDashboard /> : <DashboardStatusCard status={status} />}
+      {approved ? <RoomsDashboard showSavedNotice={showSavedNotice} /> : (
+        <>
+          {showSavedNotice && <p className="room-form-notice" role="status">Room saved locally.</p>}
+          <DashboardStatusCard status={status} />
+        </>
+      )}
     </DashboardPage>
   );
+}
+
+export default function DashboardOverviewPage() {
+  return <Suspense fallback={null}><DashboardOverviewContent /></Suspense>;
 }
