@@ -95,6 +95,14 @@ export function BoxIcon(props: IconProps) {
   return <IconFrame {...props}><path d="m12 3 9 5-9 5-9-5 9-5Z" /><path d="M3 8v9l9 5 9-5V8M12 13v9" /></IconFrame>;
 }
 
+export function ListIcon(props: IconProps) {
+  return <IconFrame {...props}><path d="M9 6h11M9 12h11M9 18h11" /><circle cx="4.5" cy="6" r=".75" /><circle cx="4.5" cy="12" r=".75" /><circle cx="4.5" cy="18" r=".75" /></IconFrame>;
+}
+
+export function PhotoIcon(props: IconProps) {
+  return <IconFrame {...props}><rect x="3" y="4" width="18" height="16" rx="2" /><circle cx="8.5" cy="9" r="1.5" /><path d="m21 15-5-5L5 20" /></IconFrame>;
+}
+
 export function TagIcon(props: IconProps) {
   return <IconFrame {...props}><path d="M20.6 13.4 13 21l-10-10V3h8l9.6 9.6a.6.6 0 0 1 0 .8Z" /><circle cx="7.5" cy="7.5" r="1" /></IconFrame>;
 }

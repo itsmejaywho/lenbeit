@@ -1,6 +1,22 @@
-import { DashboardPlaceholderRoute } from "../../../components/dashboard/DashboardPlaceholderRoute";
-import { dashboardCopy } from "../../../lib/dashboard-placeholder";
+"use client";
+
+import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
+import { DashboardPage } from "../../../components/dashboard/DashboardPage";
+import { RoomsDashboard } from "../../../components/dashboard/RoomsDashboard";
+import { useDashboardUser } from "../../../components/dashboard/DashboardContext";
+
+function RoomsPageContent() {
+  const { userStatus } = useDashboardUser();
+  const searchParams = useSearchParams();
+  return (
+    <DashboardPage title="Rooms" subtitle="Manage your rooms, availability, and listings in one place." userStatus={userStatus}>
+      {searchParams.get("saved") && <p className="room-form-notice" role="status">Room saved locally.</p>}
+      <RoomsDashboard />
+    </DashboardPage>
+  );
+}
 
 export default function RoomsPage() {
-  return <DashboardPlaceholderRoute page={dashboardCopy.rooms} href="/dashboard" />;
+  return <Suspense fallback={null}><RoomsPageContent /></Suspense>;
 }
