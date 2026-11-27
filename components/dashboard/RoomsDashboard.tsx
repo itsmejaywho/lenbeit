@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { dashboardFilterOptions, dashboardUiCopy, type DashboardRoom, type RoomStatus } from "../../lib/dashboard-placeholder";
 import { bathroomLabels, furnishingLabels, listingStatusLabels, roomStatusLabels, roomTypeLabels } from "../../lib/room-labels";
 import { useDashboardUser } from "./DashboardContext";
+import { RoomFormScreen } from "./RoomFormScreen";
 import { Placeholder } from "../Placeholder";
 import { Dropdown, type DropdownItem } from "../ui/Dropdown";
 import { DetailField } from "../ui/DetailField";
@@ -137,7 +138,7 @@ function RoomDetail({ room, open, onClose, onExpand, expanded, onListing, approv
   </>;
 }
 
-export function RoomsDashboard() {
+export function RoomsDashboard({ showSavedNotice = false }: { showSavedNotice?: boolean }) {
   const router = useRouter();
   const { rooms, updateRoom, userStatus } = useDashboardUser();
   const approved = userStatus.emailVerified && userStatus.verificationStatus === "approved";
@@ -148,7 +149,10 @@ export function RoomsDashboard() {
   const [selectedId, setSelectedId] = useState<string | null>(rooms[0]?.id ?? null);
   const [detailOpen, setDetailOpen] = useState(false);
   const [detailExpanded, setDetailExpanded] = useState(false);
+  const [addRoomOpen, setAddRoomOpen] = useState(false);
+  const [roomSaved, setRoomSaved] = useState(false);
   const [page, setPage] = useState(1);
+  const addRoomButtonRef = useRef<HTMLButtonElement>(null);
   const filterButtonRef = useRef<HTMLButtonElement>(null);
   const selectedCardRef = useRef<HTMLButtonElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
@@ -171,6 +175,11 @@ export function RoomsDashboard() {
 
   const closeFilter = () => { setFilterOpen(false); requestAnimationFrame(() => filterButtonRef.current?.focus()); };
   const closeDetail = () => { setDetailOpen(false); setDetailExpanded(false); requestAnimationFrame(() => selectedCardRef.current?.focus()); };
+  function finishAddingRoom(saved: boolean) {
+    setAddRoomOpen(false);
+    setRoomSaved(saved);
+    addRoomButtonRef.current?.focus({ preventScroll: true });
+  }
   function chooseRoom(room: DashboardRoom) { setSelectedId(room.id); selectedCardRef.current = document.activeElement instanceof HTMLButtonElement ? document.activeElement : null; if (window.matchMedia("(max-width: 1279px)").matches) setDetailOpen(true); }
   function toggleListing(room: DashboardRoom) {
     if (room.listingStatus === "published") { updateRoom(room.id, { listingStatus: "draft", updatedAt: new Date().toISOString() }); return; }
@@ -184,11 +193,11 @@ export function RoomsDashboard() {
   function duplicateRoom(room: DashboardRoom) { router.push(`/dashboard/rooms/new?duplicate=${room.id}`); }
   useEffect(() => { if (searchOpen) searchRef.current?.focus(); }, [searchOpen]);
   useEffect(() => {
-    if (!filterOpen && !detailOpen && !detailExpanded) return;
+    if (addRoomOpen || (!filterOpen && !detailOpen && !detailExpanded)) return;
     const closeOnEscape = (event: globalThis.KeyboardEvent) => { if (event.key === "Escape") { if (detailOpen || detailExpanded) closeDetail(); else closeFilter(); } };
     window.addEventListener("keydown", closeOnEscape);
     return () => window.removeEventListener("keydown", closeOnEscape);
-  }, [detailExpanded, detailOpen, filterOpen]);
+  }, [addRoomOpen, detailExpanded, detailOpen, filterOpen]);
 
   function handleTabKeyDown(event: KeyboardEvent<HTMLButtonElement>) {
     if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
@@ -206,12 +215,14 @@ export function RoomsDashboard() {
     <section className="dashboard-rooms-column" aria-label={dashboardUiCopy.allRooms}>
       <div className="dashboard-rooms-toolbar">
         <div className="dashboard-tabs" role="tablist" aria-label={dashboardUiCopy.allRooms}>{dashboardFilterOptions.tabs.map((label, index) => <button id={`dashboard-tab-${index}`} key={label} type="button" role="tab" aria-selected={tab === label} tabIndex={tab === label ? 0 : -1} className={tab === label ? "is-active" : ""} onClick={() => setTab(label)} onKeyDown={handleTabKeyDown}>{label}</button>)}</div>
-        <div className="dashboard-room-actions"><button className="dashboard-icon-button" type="button" aria-label={dashboardUiCopy.searchRooms} aria-expanded={searchOpen} onClick={() => setSearchOpen((value) => !value)}><SearchIcon /></button><button ref={filterButtonRef} className="dashboard-icon-button dashboard-filter-trigger" type="button" aria-label={dashboardUiCopy.filters} aria-expanded={filterOpen} onClick={() => setFilterOpen(true)}><FilterIcon /></button><Link className="button button-dark dashboard-add-room" href="/dashboard/rooms/new"><PlusIcon />{dashboardUiCopy.addRoom}</Link></div>
+        <div className="dashboard-room-actions"><button className="dashboard-icon-button" type="button" aria-label={dashboardUiCopy.searchRooms} aria-expanded={searchOpen} onClick={() => setSearchOpen((value) => !value)}><SearchIcon /></button><button ref={filterButtonRef} className="dashboard-icon-button dashboard-filter-trigger" type="button" aria-label={dashboardUiCopy.filters} aria-expanded={filterOpen} onClick={() => setFilterOpen(true)}><FilterIcon /></button><button ref={addRoomButtonRef} className="button button-dark dashboard-add-room" type="button" aria-haspopup="dialog" onClick={() => { setRoomSaved(false); setAddRoomOpen(true); }}><PlusIcon />{dashboardUiCopy.addRoom}</button></div>
       </div>
+      {(roomSaved || showSavedNotice) && <p key={roomSaved ? "modal" : "page"} className="room-form-notice" role="status">Room saved locally.</p>}
       {searchOpen && <div className="dashboard-search-row"><SearchIcon /><input ref={searchRef} type="search" aria-label={dashboardUiCopy.searchLabel} placeholder={dashboardUiCopy.searchRooms} value={filters.search} onChange={(event) => setFilters({ ...filters, search: event.target.value })} /><button type="button" aria-label="Close room search" onClick={() => { setSearchOpen(false); setFilters({ ...filters, search: "" }); }}>×</button></div>}
       {visibleRooms.length ? <div className="dashboard-room-grid">{visibleRooms.map((room) => <RoomCard key={room.id} room={room} selected={room.id === selectedRoom?.id} onSelect={chooseRoom} onStatus={markOccupied} onListing={toggleListing} onArchive={archiveRoom} onEdit={editRoom} onDuplicate={duplicateRoom} approved={approved} />)}</div> : <p className="dashboard-no-rooms">{dashboardUiCopy.noRooms}</p>}
       <div className="dashboard-pagination"><span>{dashboardUiCopy.showResults} {showingStart} - {showingEnd} {dashboardUiCopy.ofRooms}</span><div className="dashboard-pagination-buttons" aria-label="Room pages"><button type="button" disabled={currentPage === 1} onClick={() => setPage((value) => Math.max(1, value - 1))}>{dashboardUiCopy.previous}</button>{Array.from({ length: Math.min(pageCount, 3) }, (_, index) => index + 1).map((number) => <button key={number} type="button" aria-current={currentPage === number ? "page" : undefined} className={currentPage === number ? "is-current" : ""} onClick={() => setPage(number)}>{number}</button>)}<button type="button" disabled={currentPage === pageCount} onClick={() => setPage((value) => Math.min(pageCount, value + 1))}>{dashboardUiCopy.next}</button></div></div>
     </section>
     {selectedRoom && <RoomDetail room={selectedRoom} open={detailOpen} onClose={closeDetail} expanded={detailExpanded} onExpand={() => setDetailExpanded((value) => !value)} onListing={toggleListing} approved={approved} />}
+    {addRoomOpen && <RoomFormScreen onFinish={finishAddingRoom} />}
   </div>;
 }

@@ -11,8 +11,7 @@ function RoomsPageContent() {
   const searchParams = useSearchParams();
   return (
     <DashboardPage title="Rooms" subtitle="Manage your rooms, availability, and listings in one place." userStatus={userStatus}>
-      {searchParams.get("saved") && <p className="room-form-notice" role="status">Room saved locally.</p>}
-      <RoomsDashboard />
+      <RoomsDashboard showSavedNotice={Boolean(searchParams.get("saved"))} />
     </DashboardPage>
   );
 }

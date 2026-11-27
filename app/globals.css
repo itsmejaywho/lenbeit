@@ -1478,7 +1478,8 @@ select:focus-visible {
 .dashboard-detail-scrim.is-open { position: fixed; z-index: 21; inset: 0; display: block; border: 0; background: rgb(26 26 26 / 28%); }
 
 .room-form { width: min(800px, 100%); display: grid; gap: 16px; margin-inline: auto; }
-.dashboard-content:has(.room-form) { overflow-y: auto; }
+.dashboard-content:has(> .room-form) { overflow-y: auto; }
+.room-form-body { display: grid; gap: 16px; }
 .room-form .detail-card-content { display: grid; gap: 16px; }
 .room-form-grid { min-width: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
 .room-form-pair { min-width: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
@@ -1518,6 +1519,16 @@ select:focus-visible {
 .room-form-actions .button { min-height: 42px; padding-inline: 14px; font-size: 12px; }
 .room-form-actions .button:disabled { opacity: .55; cursor: not-allowed; }
 .room-publish-reasons { display: flex; flex-wrap: wrap; gap: 4px 16px; margin: 0; padding: 0 0 0 18px; color: var(--muted); font-size: 11px; }
+html:has(.room-form-dialog:modal) { overflow: hidden; }
+.room-form-dialog { position: fixed; inset: 0; width: min(800px, calc(100% - 24px)); max-height: 90dvh; margin: auto; padding: 0; overflow: visible; border: 1px solid var(--border); border-radius: 16px; background: var(--surface); color: var(--text); box-shadow: 0 18px 50px rgb(26 26 26 / 18%); }
+.room-form-dialog[open] { display: flex; flex-direction: column; }
+.room-form-dialog::backdrop { background: rgb(26 26 26 / 48%); }
+.room-form-dialog-header { display: flex; flex: none; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 16px 20px; }
+.room-form-dialog-header h2 { margin: 0; font-size: 22px; font-weight: 600; }
+.room-form-dialog-header p { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
+.room-form-dialog > .room-form { display: flex; min-height: 0; width: 100%; flex-direction: column; gap: 0; }
+.room-form-dialog .room-form-body { min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 0 20px 16px; }
+.room-form-dialog .room-form-action-bar { position: static; flex: none; margin: 0; border-radius: 0 0 16px 16px; }
 .room-detail-section-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 0 0 8px; color: var(--text); }
 .room-detail-edit { min-height: 30px; padding: 3px 8px; font-size: 11px; text-decoration: none; }
 .room-detail-description { margin: 0 0 12px; color: var(--text); font-size: 12px; line-height: 1.5; }
@@ -1652,7 +1663,7 @@ select:focus-visible {
 
 @media (max-width: 767px) {
   .room-form-grid, .room-detail-fields { grid-template-columns: minmax(0, 1fr); }
-  .dashboard-content:has(.room-form) { padding-bottom: 0; }
+  .dashboard-content:has(> .room-form) { padding-bottom: 0; }
   .room-form-action-bar { position: fixed; right: 13px; bottom: 76px; left: 13px; margin: 0; padding-inline: 13px; }
   .room-form-actions { flex-wrap: wrap; }
   .room-form-actions .button { flex: 1 1 auto; padding-inline: 9px; }

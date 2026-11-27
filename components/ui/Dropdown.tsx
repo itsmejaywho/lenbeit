@@ -100,8 +100,10 @@ export function Dropdown({
   const triggerRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<Array<HTMLButtonElement | HTMLAnchorElement | null>>([]);
-  const [open, setOpen] = useState(false);
+  const [menuContainer, setMenuContainer] = useState<Element | null>(null);
+  const open = menuContainer !== null;
   const [position, setPosition] = useState<Position | null>(null);
+  const positioned = position !== null;
   const selectedLabel = items.find((item) => item.id === value)?.label;
   // "icon" must not produce "shared-dropdown-icon": that class is the menu-item
   // icon slot and its svg sizing would leak onto this wrapper.
@@ -109,7 +111,7 @@ export function Dropdown({
 
   const showMenu = () => {
     setPosition(null);
-    setOpen(true);
+    setMenuContainer(rootRef.current?.closest("dialog:modal") ?? document.body);
   };
 
   const updatePosition = useCallback(() => {
@@ -164,8 +166,6 @@ export function Dropdown({
   useLayoutEffect(() => {
     if (!open) return;
     updatePosition();
-    const focusTarget = itemRefs.current.find((item) => item !== null);
-    focusTarget?.focus();
     const handleViewportChange = () => updatePosition();
     window.addEventListener("resize", handleViewportChange);
     window.addEventListener("scroll", handleViewportChange, true);
@@ -175,12 +175,16 @@ export function Dropdown({
     };
   }, [open, updatePosition]);
 
+  useLayoutEffect(() => {
+    if (open && positioned) itemRefs.current.find((item) => item !== null)?.focus();
+  }, [open, positioned]);
+
   useEffect(() => {
     if (!open) return;
     const handleOutsidePointer = (event: PointerEvent) => {
       const target = event.target as Node;
       if (!rootRef.current?.contains(target) && !menuRef.current?.contains(target)) {
-        setOpen(false);
+        setMenuContainer(null);
       }
     };
     document.addEventListener("pointerdown", handleOutsidePointer);
@@ -190,7 +194,7 @@ export function Dropdown({
   const choose = (item: DropdownItem) => {
     if (selectStyle) onChange?.(item.id);
     item.onSelect?.();
-    setOpen(false);
+    setMenuContainer(null);
     triggerRef.current?.focus();
   };
 
@@ -199,12 +203,13 @@ export function Dropdown({
       (item): item is HTMLButtonElement | HTMLAnchorElement => item !== null,
     );
     const currentIndex = current.indexOf(document.activeElement as HTMLButtonElement);
-    if (event.key === "Escape") {
+    if (event.key === "Escape" && open) {
       event.preventDefault();
-      setOpen(false);
+      setMenuContainer(null);
       triggerRef.current?.focus();
     } else if (event.key === "Tab") {
-      setOpen(false);
+      if (open) triggerRef.current?.focus();
+      setMenuContainer(null);
     } else if (event.key === "ArrowDown" || event.key === "ArrowUp" || event.key === "Home" || event.key === "End") {
       event.preventDefault();
       if (!open) showMenu();
@@ -219,7 +224,7 @@ export function Dropdown({
       else requestAnimationFrame(() => itemRefs.current[0]?.focus());
     } else if ((event.key === "Enter" || event.key === " ") && !open) {
       event.preventDefault();
-      setOpen(true);
+      showMenu();
     } else if ((event.key === "Enter" || event.key === " ") && open && currentIndex < 0) {
       event.preventDefault();
       itemRefs.current[0]?.focus();
@@ -232,7 +237,7 @@ export function Dropdown({
   const customTrigger = isValidElement(triggerContent)
     ? cloneElement(triggerContent, { "aria-hidden": true } as Record<string, unknown>)
     : triggerContent;
-  const portalMenu = open && typeof document !== "undefined"
+  const portalMenu = menuContainer
     ? createPortal(
       <div
           className={`shared-dropdown-menu${variant === "inline" ? " shared-dropdown-menu-inline" : ""}`}
@@ -285,7 +290,7 @@ export function Dropdown({
             );
           })}
         </div>,
-        document.body,
+        menuContainer,
       )
     : null;
 
@@ -300,7 +305,7 @@ export function Dropdown({
         aria-labelledby={ariaLabelledBy}
         aria-describedby={ariaDescribedBy}
         className={`shared-dropdown-trigger${variant === "inline" ? " shared-dropdown-trigger-inline" : ""}${variant === "icon" ? " shared-dropdown-trigger-icon" : ""}`}
-        onClick={(event) => { event.stopPropagation(); if (open) setOpen(false); else showMenu(); }}
+        onClick={(event) => { event.stopPropagation(); if (open) setMenuContainer(null); else showMenu(); }}
         onBlur={onBlur}
         ref={triggerRef}
         type="button"

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, type ChangeEvent, type FormEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type ChangeEvent, type FormEvent, type KeyboardEvent } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -28,12 +28,12 @@ const maxPhotoSize = 5 * 1024 * 1024;
 
 function options<T extends string>(items: readonly { id: T; label: string }[]) { return items; }
 
-export function RoomFormScreen({ roomId }: { roomId?: string }) {
+export function RoomFormScreen({ roomId, onFinish }: { roomId?: string; onFinish?: (saved: boolean) => void }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { userStatus, rooms, saveRoom } = useDashboardUser();
   const editing = Boolean(roomId);
-  const duplicateId = searchParams.get("duplicate");
+  const duplicateId = onFinish ? null : searchParams.get("duplicate");
   const sourceRoom = rooms.find((room) => room.id === (roomId ?? duplicateId));
   const initialRoom = sourceRoom;
   const [values, setValues] = useState<FormValues>(() => initialRoom ? {
@@ -49,6 +49,9 @@ export function RoomFormScreen({ roomId }: { roomId?: string }) {
   const [photoError, setPhotoError] = useState("");
   const [triedSubmit, setTriedSubmit] = useState(false);
   const [notice, setNotice] = useState("");
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
+  const backdropPressed = useRef(false);
   const photoInputRef = useRef<HTMLInputElement>(null);
   const nameRef = useRef<HTMLInputElement>(null);
   const rentRef = useRef<HTMLInputElement>(null);
@@ -62,6 +65,10 @@ export function RoomFormScreen({ roomId }: { roomId?: string }) {
     floorAreaSqm: initialRoom.floorAreaSqm ? String(initialRoom.floorAreaSqm) : "", description: initialRoom.description,
     rules: initialRoom.rules ?? "", contactPhone: initialRoom.contactPhone ?? "",
   } : emptyValues) || JSON.stringify(photos) !== JSON.stringify(initialRoom?.photos ?? []), [initialRoom, duplicateId, photos, values]);
+
+  useEffect(() => {
+    dialogRef.current?.showModal();
+  }, []);
 
   useEffect(() => {
     const beforeUnload = (event: BeforeUnloadEvent) => {
@@ -184,12 +191,36 @@ export function RoomFormScreen({ roomId }: { roomId?: string }) {
       createdAt: roomId ? initialRoom?.createdAt ?? now : now, updatedAt: now, tone: initialRoom?.tone ?? "sand",
     };
     saveRoom(room);
-    router.push("/dashboard/rooms?saved=1");
+    if (onFinish) {
+      // The saved room still uses these object URLs after the dialog unmounts.
+      ownedUrls.current.clear();
+    }
+    finish(true);
   }
 
   function submit(event: FormEvent<HTMLFormElement>) { event.preventDefault(); save(false); }
+  function finish(saved: boolean) {
+    if (onFinish) {
+      dialogRef.current?.close();
+      onFinish(saved);
+    } else {
+      router.push(saved ? "/dashboard/rooms?saved=1" : "/dashboard/rooms");
+    }
+  }
+
   function cancel() {
-    if (!dirty || window.confirm("Discard your unsaved room changes?")) router.push("/dashboard/rooms");
+    if (!dirty || window.confirm("Discard your unsaved room changes?")) finish(false);
+  }
+
+  function wrapDialogFocus(event: KeyboardEvent<HTMLDialogElement>) {
+    if (event.key !== "Tab") return;
+    const first = closeRef.current;
+    const last = Array.from(event.currentTarget.querySelectorAll<HTMLButtonElement>(".room-form-actions button:enabled")).at(-1);
+    const target = event.shiftKey && event.target === first ? last : !event.shiftKey && event.target === last ? first : null;
+    if (target) {
+      event.preventDefault();
+      target.focus();
+    }
   }
 
   const roomTypeOptions = options(Object.entries(roomTypeLabels).map(([id, label]) => ({ id: id as RoomType, label })));
@@ -198,9 +229,8 @@ export function RoomFormScreen({ roomId }: { roomId?: string }) {
   const furnishingOptions = [{ id: "unfurnished", label: "Unfurnished" }, { id: "semi", label: "Semi-furnished" }, { id: "furnished", label: "Furnished" }];
   const monthOptions = [0, 1, 2, 3].map((value) => ({ id: String(value), label: String(value) }));
 
-  return (
-    <DashboardPage title={editing ? "Edit room" : "Add room"} subtitle="Start with the basics. You can finish the rest later." userStatus={userStatus}>
-      <form className="room-form" onSubmit={submit} noValidate>
+  const formBody = (
+      <div className="room-form-body">
         <DetailCard icon={<HomeIcon />} title="Basics">
           <p className="room-form-shortcut"><button type="button" className="room-text-link" onClick={() => setNotice("Coming soon.")}>Add many rooms at once</button></p>
           {notice && <p className="room-form-notice" role="status">{notice}</p>}
@@ -262,7 +292,12 @@ export function RoomFormScreen({ roomId }: { roomId?: string }) {
             </div>
           </figure>)}</div>
         </DetailCard>
-        <div className="room-form-action-spacer" />
+      </div>
+  );
+  const form = (
+      <form className="room-form" onSubmit={submit} noValidate>
+        {formBody}
+        {!onFinish && <div className="room-form-action-spacer" />}
         <div className="room-form-action-bar">
           <div className="room-form-actions">
             <button className="button button-ghost" type="button" onClick={cancel}>Cancel</button>
@@ -273,6 +308,37 @@ export function RoomFormScreen({ roomId }: { roomId?: string }) {
           {triedSubmit && Object.values(errors).some(Boolean) && <p className="room-field-error" role="status" aria-live="polite">Fix the highlighted fields before saving.</p>}
         </div>
       </form>
+  );
+  const title = editing ? "Edit room" : "Add room";
+  const subtitle = "Start with the basics. You can finish the rest later.";
+
+  if (onFinish) return (
+    <dialog
+      ref={dialogRef}
+      className="room-form-dialog"
+      aria-labelledby="room-form-dialog-title"
+      aria-describedby="room-form-dialog-description"
+      onCancel={(event) => { event.preventDefault(); cancel(); }}
+      onPointerDown={(event) => { backdropPressed.current = event.target === event.currentTarget; }}
+      onClick={(event) => {
+        if (backdropPressed.current && event.target === event.currentTarget) cancel();
+      }}
+      onKeyDown={wrapDialogFocus}
+    >
+      <header className="room-form-dialog-header">
+        <div>
+          <h2 id="room-form-dialog-title">{title}</h2>
+          <p id="room-form-dialog-description">{subtitle}</p>
+        </div>
+        <button ref={closeRef} className="dashboard-icon-button" type="button" aria-label="Close Add room" onClick={cancel}>×</button>
+      </header>
+      {form}
+    </dialog>
+  );
+
+  return (
+    <DashboardPage title={title} subtitle={subtitle} userStatus={userStatus}>
+      {form}
     </DashboardPage>
   );
 }
